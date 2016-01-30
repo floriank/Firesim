@@ -1,0 +1,27 @@
+{
+  "name": "firesim",
+  "description": "A forest fire simulation using canvas",
+  "main": "index.html",
+  "authors": [
+    "Julia Biella"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "forest",
+    "fire",
+    "canvas"
+  ],
+  "homepage": "https://github.com/julesbb/firesim",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.0"
+  }
+}

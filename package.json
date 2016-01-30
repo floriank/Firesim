@@ -1,0 +1,28 @@
+{
+  "name": "firesim",
+  "version": "0.0.1",
+  "description": "A forest fire simulation using canvas",
+  "main": "index.html",
+  "devDependencies": {
+    "bower": "^1.7.7"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julesbb/firesim.git"
+  },
+  "keywords": [
+    "forest",
+    "fire",
+    "canvas"
+  ],
+  "author": "Julia Biella",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/julesbb/firesim/issues"
+  },
+  "homepage": "https://github.com/julesbb/firesim#readme",
+  "private": true
+}
