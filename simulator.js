@@ -39,7 +39,9 @@
   function Tree() {
     return {
       colour: COLOUR.TREE_ALIVE,
-      behaviour: function() {},
+      behaviour: function() {
+        console.log("Do you like my decorations?");
+      },
       wetness: wetness,
       tree: true,
       alive: true
@@ -49,7 +51,9 @@
   function Fire() {
     return {
       colour: COLOUR.FIRE,
-      behaviour: function() {},
+      behaviour: function() {
+        console.log('buuuuuuuuuuuuurn.');
+      },
       lifepoints: 3,
       fire: true
     }
@@ -58,7 +62,9 @@
   function Grass() {
     return {
       colour: COLOUR.GRASS,
-      behaviour: function() {},
+      behaviour: function() {
+        console.log('I am grass.');
+      },
       grass: true
     }
   }
@@ -134,12 +140,17 @@
   }
 
   var timer = null;
-  var MIN_ROUND_LENGTH = 0.5;
+  var MIN_ROUND_LENGTH = 1;
   function startSimulation() {
     // do stuff
     // do next stuff;
     var computeGrid = function() {
       timer = setTimeout(function() {
+        for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
+          for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
+            ACTOR_LIST[i][k].behaviour(i, k);
+          }
+        }
         updateCounter();
         timer = setTimeout(computeGrid, MIN_ROUND_LENGTH * 1000);
       }, MIN_ROUND_LENGTH * 1000);
