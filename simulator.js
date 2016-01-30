@@ -36,15 +36,50 @@
   }
 
   var wetness = parseInt($('#tree-wetness').val(), 10);
+  var FIRE_INTENSITY = parseInt($('#fire-intensity').val(), 10);
+
   function Tree() {
     return {
       colour: COLOUR.TREE_ALIVE,
-      behaviour: function() {
-        console.log("Do you like my decorations?");
+      behaviour: function(x, y) {
+        if (this.dead) {
+          return;
+        };
+        var left = x - PIXEL_WIDTH,
+            right = x + PIXEL_WIDTH,
+            up = y - PIXEL_HEIGHT,
+            down = y + PIXEL_HEIGHT;
+        if (ACTOR_LIST[left] && ACTOR_LIST[left][y] && ACTOR_LIST[left][y].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[right] && ACTOR_LIST[right][y] && ACTOR_LIST[right][y].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[x] && ACTOR_LIST[x][up] && ACTOR_LIST[x][up].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[x] && ACTOR_LIST[x][down] && ACTOR_LIST[x][down].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[right] && ACTOR_LIST[right][down] && ACTOR_LIST[right][down].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[left] && ACTOR_LIST[left][down] && ACTOR_LIST[left][down].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[right] && ACTOR_LIST[right][up] && ACTOR_LIST[right][up].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
+        if (ACTOR_LIST[left] && ACTOR_LIST[left][up] && ACTOR_LIST[left][up].fire) {
+          this.wetness -= FIRE_INTESITY;
+        }
       },
       wetness: wetness,
       tree: true,
-      alive: true
+      alive: true,
+      dry: function() {
+        return this.wetness <= 0;
+      }
     }
   }
 
@@ -52,7 +87,6 @@
     return {
       colour: COLOUR.FIRE,
       behaviour: function() {
-        console.log('buuuuuuuuuuuuurn.');
       },
       lifepoints: 3,
       fire: true
@@ -62,9 +96,7 @@
   function Grass() {
     return {
       colour: COLOUR.GRASS,
-      behaviour: function() {
-        console.log('I am grass.');
-      },
+      behaviour: $.noop,
       grass: true
     }
   }
@@ -144,6 +176,7 @@
   function startSimulation() {
     // do stuff
     // do next stuff;
+    FIRE_INTESITY = parseInt($('#fire-intensity').val(), 10);
     var computeGrid = function() {
       timer = setTimeout(function() {
         for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
@@ -184,12 +217,14 @@
   play.on('click', function() {
     play.attr('disabled', true);
     pause.removeAttr('disabled');
+    $('.user-input').attr('disabled', true);
     startSimulation();
   });
 
   pause.on('click', function() {
     pause.attr('disabled', true);
     play.removeAttr('disabled');
+    $('.user-input').removeAttr('disabled');
     stopSimulation();
   })
 }(jQuery));
