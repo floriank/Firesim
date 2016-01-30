@@ -7,3 +7,18 @@
 
 body {
 }
+
+tr.alive > td {
+ font-weight: bold;
+ color: rgba(0, 92, 42, 1);
+}
+
+tr.burning > td {
+  font-weight: bold;
+  color: rgba(248, 53, 42, 1);
+}
+
+tr.dead > td {
+  font-weight: bold;
+  color: rgba(92, 15, 7, 1);
+}

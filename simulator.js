@@ -23,7 +23,7 @@
   canvas.height = CANVAS_HEIGHT;
 
   // assume 5 pixel squares for grid cells
-  var PIXEL_WIDTH = PIXEL_HEIGHT = 10,
+  var PIXEL_WIDTH = PIXEL_HEIGHT = 5,
       context = canvas.getContext('2d');
 
   function drawPixel(x, y, actor) {
@@ -40,7 +40,9 @@
     return {
       colour: COLOUR.TREE_ALIVE,
       behaviour: function() {},
-      wetness: wetness
+      wetness: wetness,
+      tree: true,
+      alive: true
     }
   }
 
@@ -56,7 +58,8 @@
   function Grass() {
     return {
       colour: COLOUR.GRASS,
-      behaviour: function() {}
+      behaviour: function() {},
+      grass: true
     }
   }
 
@@ -66,11 +69,12 @@
     density /= 100;
     wetness = parseInt($('#tree-wetness').val(), 10);
     wetness = wetness > 100 ? 100 : wetness;
-    for (var k = 0; k < CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
+    for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
       for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
         drawPixel(i, k);
       };
     };
+    calculateStatus();
   }
 
   function setFire(event) {
@@ -82,13 +86,66 @@
 
     if (!existingActor.fire) {
       drawPixel(coordX, coordY, Fire);
+      calculateStatus();
     }
   }
 
+  function calculateStatus() {
+    var treeCount = 0,
+        fireCount = 0,
+        aliveCount = 0,
+        deadCount = 0;
+
+    for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
+      for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
+        var actor = ACTOR_LIST[i][k];
+
+        if (actor.grass) {
+          continue;
+        }
+
+        if (actor.fire) {
+          fireCount += 1;
+        };
+
+        if (actor.tree && actor.alive) {
+          treeCount += 1;
+          aliveCount += 1;
+        };
+
+        if (actor.tree && !actor.alive) {
+          treeCount += 1;
+          deadCount += 1;
+        };
+      };
+    };
+
+    $('#trees-totals').text(treeCount);
+    $('#trees-burning').text(fireCount);
+    $('#trees-alive').text(aliveCount);
+    $('#trees-dead').text(deadCount);
+  }
+
+  // initially draw the canvas
   drawCanvas();
 
+  // draw the canvas when clicking on regenerate
   $('#regenerate').on('click', drawCanvas);
 
+  // when clicked on the canvas, set fire
   $(canvas).on('click', setFire);
 
+  // when clicking on play, start the simulation
+  var play = $('#play'),
+      pause = $('#pause');
+
+  play.on('click', function() {
+    play.attr('disabled', true);
+    pause.removeAttr('disabled');
+  });
+
+  pause.on('click', function() {
+    pause.attr('disabled', true);
+    play.removeAttr('disabled');
+  })
 }(jQuery));

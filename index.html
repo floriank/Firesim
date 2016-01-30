@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Fire simulation</title>
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -42,25 +43,25 @@
             <thead>
               <tr>
                 <th>Total trees</th>
-                <th class="text-right" id="trees-total">#</th>
+                <th class="text-right" id="trees-totals">#</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>... alive</td>
+              <tr class="alive">
+                <td>Trees alive</td>
                 <td class="text-right" id="trees-alive">#</td>
               </tr>
-              <tr>
-                <td>... burning</td>
+              <tr class="burning">
+                <td>Fires</td>
                 <td class="text-right" id="trees-burning">#</td>
               </tr>
-              <tr>
-                <td>... dead</td>
+              <tr class="dead">
+                <td>Dead trees</td>
                 <td class="text-right" id="trees-dead">#</td>
               </tr>
               <tr>
                 <td>Current round</td>
-                <td class="text-right" id="current-round">#</td>
+                <td class="text-right" id="current-round">0</td>
               </tr>
             </tbody>
           </table>
@@ -68,8 +69,20 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-4">
-        <button id="regenerate" class="btn">Regenerate Forest</button>
+      <div class="col-xs-4 text-center">
+        <button class="btn btn-primary" id="play" title="Play simulation">
+          <i class="fa fa-play"></i>
+        </button>
+      </div>
+      <div class="col-xs-4 text-center">
+        <button id="pause" disabled class="btn" title="Pause simulation">
+          <i class="fa fa-pause"></i>
+        </button>
+      </div>
+      <div class="col-xs-4 text-center">
+        <button id="regenerate" class="btn btn-success" title="Regenerate forest">
+          <i class="fa fa-refresh fa-btn"></i>
+        </button>
       </div>
     </div>
   </div>
