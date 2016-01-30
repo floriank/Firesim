@@ -126,6 +126,37 @@
     $('#trees-dead').text(deadCount);
   }
 
+  function randomColour() {
+    return 'rgba(' +
+      Math.floor(Math.random() * 256) + ',' +
+      Math.floor(Math.random() * 256) + ',' +
+      Math.floor(Math.random() * 256) + ',1)';
+  }
+
+  var timer = null;
+  var MIN_ROUND_LENGTH = 0.5;
+  function startSimulation() {
+    // do stuff
+    // do next stuff;
+    var computeGrid = function() {
+      timer = setTimeout(function() {
+        updateCounter();
+        timer = setTimeout(computeGrid, MIN_ROUND_LENGTH * 1000);
+      }, MIN_ROUND_LENGTH * 1000);
+    }
+    computeGrid();
+  }
+
+  var currentRound = parseInt($('#current-round').text(), 10);
+  function updateCounter() {
+    currentRound += 1;
+    $('#current-round').text(currentRound);
+  }
+
+  function stopSimulation() {
+    clearTimeout(timer);
+  }
+
   // initially draw the canvas
   drawCanvas();
 
@@ -142,10 +173,12 @@
   play.on('click', function() {
     play.attr('disabled', true);
     pause.removeAttr('disabled');
+    startSimulation();
   });
 
   pause.on('click', function() {
     pause.attr('disabled', true);
     play.removeAttr('disabled');
+    stopSimulation();
   })
 }(jQuery));
