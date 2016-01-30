@@ -17,6 +17,8 @@
     GRASS: 'rgba(25, 169, 91, 1)'
   }
 
+  var ACTOR_LIST = {};
+
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
 
@@ -25,7 +27,10 @@
       context = canvas.getContext('2d');
 
   function drawPixel(x, y, actor) {
+    // determine the actor, if none given, randomize
     var actor = typeof actor === 'function' ? actor() : Math.random() <= density ? Tree() : Grass();
+    ACTOR_LIST[x] = typeof ACTOR_LIST[x] !== 'undefined' ? ACTOR_LIST[x] : {}
+    ACTOR_LIST[x][y] = actor;
     context.fillStyle = actor.colour;
     context.fillRect(x, y, PIXEL_WIDTH, PIXEL_HEIGHT);
   }
@@ -43,7 +48,8 @@
     return {
       colour: COLOUR.FIRE,
       behaviour: function() {},
-      lifepoints: 3
+      lifepoints: 3,
+      fire: true
     }
   }
 
@@ -58,6 +64,8 @@
     density = parseInt($('#tree-density').val(), 10);
     density = density > 100 ? 100 : density;
     density /= 100;
+    wetness = parseInt($('#tree-wetness').val(), 10);
+    wetness = wetness > 100 ? 100 : wetness;
     for (var k = 0; k < CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
       for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
         drawPixel(i, k);
@@ -70,8 +78,11 @@
         y = event.pageY - $(canvas).offset().top,
         coordX = Math.floor(x / PIXEL_WIDTH) * PIXEL_WIDTH,
         coordY = Math.floor(y / PIXEL_HEIGHT) * PIXEL_HEIGHT;
+    var existingActor = ACTOR_LIST[coordX][coordY];
 
-    drawPixel(coordX, coordY, Fire);
+    if (!existingActor.fire) {
+      drawPixel(coordX, coordY, Fire);
+    }
   }
 
   drawCanvas();
