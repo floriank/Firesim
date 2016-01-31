@@ -23,14 +23,15 @@
   canvas.height = CANVAS_HEIGHT;
 
   // assume 5 pixel squares for grid cells
-  var PIXEL_WIDTH = PIXEL_HEIGHT = 5,
+  var PIXEL_WIDTH = PIXEL_HEIGHT = 10,
       context = canvas.getContext('2d');
 
   function drawPixel(x, y, actor) {
     // determine the actor, if none given, randomize
-    var actor = typeof actor === 'function' ? actor() : Math.random() <= density ? Tree() : Grass();
-    ACTOR_LIST[x] = typeof ACTOR_LIST[x] !== 'undefined' ? ACTOR_LIST[x] : {}
+    var actor = actor ? actor : Math.random() <= density ? Tree() : Grass();
+    ACTOR_LIST[x] = typeof ACTOR_LIST[x] !== 'undefined' ? ACTOR_LIST[x] : {};
     ACTOR_LIST[x][y] = actor;
+
     context.fillStyle = actor.colour;
     context.fillRect(x, y, PIXEL_WIDTH, PIXEL_HEIGHT);
   }
@@ -77,8 +78,8 @@
       wetness: wetness,
       tree: true,
       alive: true,
-      dry: function() {
-        return this.wetness <= 0;
+      flammable: function() {
+        return this.alive && this.wetness <= 0;
       }
     }
   }
@@ -86,7 +87,51 @@
   function Fire() {
     return {
       colour: COLOUR.FIRE,
-      behaviour: function() {
+      behaviour: function(x, y) {
+        // lifepoints < 1 => dead tree
+        // lifepoint > 1 => neighboring field dry? => fire!
+        if (this.lifepoints > 0) {
+          var left = x - PIXEL_WIDTH,
+              right = x + PIXEL_WIDTH,
+              up = y - PIXEL_HEIGHT,
+              down = y + PIXEL_HEIGHT;
+
+          function burn(x, y) {
+            ACTOR_LIST[x][y] = Fire();
+          }
+
+          if (ACTOR_LIST[left] && ACTOR_LIST[left][y] && ACTOR_LIST[left][y].tree && ACTOR_LIST[left][y].flammable()) {
+            burn(left, y);
+          }
+          if (ACTOR_LIST[right] && ACTOR_LIST[right][y] && ACTOR_LIST[right][y].tree && ACTOR_LIST[right][y].flammable()) {
+            burn(right, y);
+          }
+          if (ACTOR_LIST[x] && ACTOR_LIST[x][up] && ACTOR_LIST[x][up].tree && ACTOR_LIST[x][up].flammable()) {
+            burn(x, up);
+          }
+          if (ACTOR_LIST[x] && ACTOR_LIST[x][down] && ACTOR_LIST[x][down].tree && ACTOR_LIST[x][down].flammable()) {
+            burn(x, down);
+          }
+          if (ACTOR_LIST[right] && ACTOR_LIST[right][down] && ACTOR_LIST[right][down].tree && ACTOR_LIST[right][down].flammable()) {
+            burn(right, down);
+          }
+          if (ACTOR_LIST[left] && ACTOR_LIST[left][down] && ACTOR_LIST[left][down].tree && ACTOR_LIST[left][down].flammable()) {
+            burn(left, down);
+          }
+          if (ACTOR_LIST[right] && ACTOR_LIST[right][up] && ACTOR_LIST[right][up].tree && ACTOR_LIST[right][up].flammable()) {
+            burn(right, up);
+          }
+          if (ACTOR_LIST[left] && ACTOR_LIST[left][up] && ACTOR_LIST[left][up].tree && ACTOR_LIST[left][up].flammable()) {
+            burn(left, up);
+          }
+        } else {
+          var deadTree = Tree();
+          deadTree.alive = false;
+          deadTree.colour = COLOUR.TREE_DEAD;
+          ACTOR_LIST[x][y] = deadTree;
+        }
+        this.lifepoints -= 1;
+
       },
       lifepoints: 3,
       fire: true
@@ -123,16 +168,18 @@
     var existingActor = ACTOR_LIST[coordX][coordY];
 
     if (!existingActor.fire) {
-      drawPixel(coordX, coordY, Fire);
+      drawPixel(coordX, coordY, Fire());
       calculateStatus();
     }
   }
 
+  var fireCount = 0;
   function calculateStatus() {
     var treeCount = 0,
-        fireCount = 0,
         aliveCount = 0,
         deadCount = 0;
+
+    fireCount = 0; // reset each time because shared with other functions
 
     for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
       for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
@@ -172,28 +219,51 @@
   }
 
   var timer = null;
-  var MIN_ROUND_LENGTH = 1;
+  var MIN_ROUND_LENGTH = 0.25; // tick length in seconds
   function startSimulation() {
     // do stuff
     // do next stuff;
     FIRE_INTESITY = parseInt($('#fire-intensity').val(), 10);
     var computeGrid = function() {
-      timer = setTimeout(function() {
+      timer = setTimeout(function doCompute() {
+        if (fireCount === 0) {
+          clearTimeout(timer);
+          pause.trigger('click');
+          updateCounter(true); // reset the current counter to 0
+          return;
+        };
         for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
           for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
             ACTOR_LIST[i][k].behaviour(i, k);
           }
         }
+        drawCanvasFromActors();
+        calculateStatus();
         updateCounter();
-        timer = setTimeout(computeGrid, MIN_ROUND_LENGTH * 1000);
+        timer = setTimeout(doCompute, MIN_ROUND_LENGTH * 1000);
       }, MIN_ROUND_LENGTH * 1000);
     }
     computeGrid();
   }
 
+  function drawCanvasFromActors() {
+    for (var i = 0; i <= CANVAS_WIDTH; i += PIXEL_WIDTH) {
+      for (var k = 0; k <= CANVAS_HEIGHT; k += PIXEL_HEIGHT) {
+        if (ACTOR_LIST[i][k].grass) {
+          continue;
+        }
+        drawPixel(i, k, ACTOR_LIST[i][k]);
+      }
+    }
+  }
+
   var currentRound = parseInt($('#current-round').text(), 10);
-  function updateCounter() {
-    currentRound += 1;
+  function updateCounter(count) {
+    if (count === true) {
+      currentRound = 0;
+    } else {
+      currentRound += 1;
+    }
     $('#current-round').text(currentRound);
   }
 
