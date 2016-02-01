@@ -210,14 +210,7 @@
     $('#trees-alive').text(aliveCount);
     $('#trees-dead').text(deadCount);
   }
-
-  function randomColour() {
-    return 'rgba(' +
-      Math.floor(Math.random() * 256) + ',' +
-      Math.floor(Math.random() * 256) + ',' +
-      Math.floor(Math.random() * 256) + ',1)';
-  }
-
+  
   var timer = null;
   var MIN_ROUND_LENGTH = 0.25; // tick length in seconds
   function startSimulation() {
