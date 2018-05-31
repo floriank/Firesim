@@ -1,5 +1,5 @@
 (function Simulator($) {
-  if (typeof window.getComputedStyle === "undefined") {
+  if (typeof window.getComputedStyle == "undefined") {
     return;
   };
 
